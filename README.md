@@ -1,3 +1,5 @@
+NevynIt - Current fork only updated the include files, but not any of the other code, which therefore is now broken.
+
 # fpm
 A C++ header-only fixed-point math library. "fpm" stands for "fixed-point math".
 
