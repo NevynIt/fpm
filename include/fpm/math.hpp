@@ -124,6 +124,7 @@ constexpr inline bool isunordered(fixed<IntBits, F, S, R> x, fixed<IntBits, F, S
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 inline fixed<IntBits, F, S, R> ceil(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value();
     if (value > 0) value += FRAC - 1;
@@ -133,6 +134,7 @@ inline fixed<IntBits, F, S, R> ceil(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 inline fixed<IntBits, F, S, R> floor(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value();
     if (value < 0) value -= FRAC - 1;
@@ -142,6 +144,7 @@ inline fixed<IntBits, F, S, R> floor(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 inline fixed<IntBits, F, S, R> trunc(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     constexpr auto FRAC = B(1) << F;
     return fixed<IntBits, F, S, R>::from_raw_value(x.raw_value() / FRAC * FRAC);
 }
@@ -149,6 +152,7 @@ inline fixed<IntBits, F, S, R> trunc(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 inline fixed<IntBits, F, S, R> round(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value() / (FRAC / 2);
     return fixed<IntBits, F, S, R>::from_raw_value(((value / 2) + (value % 2)) * FRAC);
@@ -157,6 +161,7 @@ inline fixed<IntBits, F, S, R> round(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> nearbyint(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     // Rounding mode is assumed to be FE_TONEAREST
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value();
@@ -217,7 +222,7 @@ constexpr inline fixed<I1, F1, S1, R1> copysign(fixed<I1, F1, S1, R1> x, fixed<I
 {
     return
         x = abs(x),
-        (y >= fixed<C, J, G, S>{0}) ? x : -x;
+        (y >= fixed<I2, F2, S2, R2>{0}) ? x : -x;
 }
 
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
@@ -237,6 +242,7 @@ constexpr inline fixed<IntBits, F, S, R> nexttoward(fixed<IntBits, F, S, R> from
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 inline fixed<IntBits, F, S, R> modf(fixed<IntBits, F, S, R> x, fixed<IntBits, F, S, R>* iptr) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     const auto raw = x.raw_value();
     constexpr auto FRAC = B{1} << F;
     *iptr = fixed<IntBits, F, S, R>::from_raw_value(raw / FRAC * FRAC);
@@ -286,6 +292,7 @@ template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> pow(fixed<IntBits, F, S, R> base, fixed<IntBits, F, S, R> exp) noexcept
 {
     using Fixed = fixed<IntBits, F, S, R>;
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
 
     if (base == Fixed(0)) {
         assert(exp > Fixed(0));
@@ -314,6 +321,7 @@ fixed<IntBits, F, S, R> pow(fixed<IntBits, F, S, R> base, fixed<IntBits, F, S, R
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> exp(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     using Fixed = fixed<IntBits, F, S, R>;
     if (x < Fixed(0)) {
         return 1 / exp(-x);
@@ -335,6 +343,7 @@ fixed<IntBits, F, S, R> exp(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> exp2(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     using Fixed = fixed<IntBits, F, S, R>;
     if (x < Fixed(0)) {
         return 1 / exp2(-x);
@@ -362,6 +371,7 @@ fixed<IntBits, F, S, R> expm1(fixed<IntBits, F, S, R> x) noexcept
 template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> log2(fixed<IntBits, F, S, R> x) noexcept
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
     using Fixed = fixed<IntBits, F, S, R>;
     assert(x > Fixed(0));
 
@@ -409,6 +419,8 @@ template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> cbrt(fixed<IntBits, F, S, R> x) noexcept
 {
     using Fixed = fixed<IntBits, F, S, R>;
+    using I = typename Fixed::IntermediateType;
+    using B = typename Fixed::BaseType;
 
     if (x == Fixed(0))
     {
@@ -461,6 +473,8 @@ template <unsigned int IntBits, unsigned int F, bool S, bool R>
 fixed<IntBits, F, S, R> sqrt(fixed<IntBits, F, S, R> x) noexcept
 {
     using Fixed = fixed<IntBits, F, S, R>;
+    using I = typename Fixed::IntermediateType;
+    using B = typename Fixed::BaseType;
 
     assert(x >= Fixed(0));
     if (x == Fixed(0))
