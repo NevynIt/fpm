@@ -665,6 +665,40 @@ constexpr inline fixed<I, F, S, R> operator*(T x, const fixed<I, F, S, R>& y) no
     return fixed<I, F, S, R>(y) *= x;
 }
 
+template<size_t I1, size_t F1, bool S1, size_t I2, size_t F2, bool S2>
+typename std::enable_if<(I1 > I2), fpm::fixed<I1, F1, S1>>::type
+operator*(const fpm::fixed<I1, F1, S1>& a, const fpm::fixed<I2, F2, S2>& b)
+{
+    static_assert(S1 == S2, "Signedness must be the same");
+    if (S1)
+    {
+        using IntermediateType = typename fpm::detail::type_from_size<I1 + I2 + F1 + F2>::signed_type;
+        return fpm::fixed<I1, F1, S1>::from_raw_value(((IntermediateType)a.raw_value() * b.raw_value()) >> (F2));
+    }
+    else
+    {
+        using IntermediateType = typename fpm::detail::type_from_size<I1 + I2 + F1 + F2>::unsigned_type;
+        return fpm::fixed<I1, F1, S1>::from_raw_value(((IntermediateType)a.raw_value() * b.raw_value()) >> (F2));
+    }
+}
+
+template<size_t I1, size_t F1, bool S1, size_t I2, size_t F2, bool S2>
+typename std::enable_if<(I1 < I2), fpm::fixed<I2, F2, S2>>::type
+operator*(const fpm::fixed<I1, F1, S1>& a, const fpm::fixed<I2, F2, S2>& b)
+{
+    static_assert(S1 == S2, "Signedness must be the same");
+    if (S1)
+    {
+        using IntermediateType = typename fpm::detail::type_from_size<I1 + I2 + F1 + F2>::signed_type;
+        return fpm::fixed<I2, F2, S2>::from_raw_value(((IntermediateType)a.raw_value() * b.raw_value()) >> (F1));
+    }
+    else
+    {
+        using IntermediateType = typename fpm::detail::type_from_size<I1 + I2 + F1 + F2>::unsigned_type;
+        return fpm::fixed<I2, F2, S2>::from_raw_value(((IntermediateType)a.raw_value() * b.raw_value()) >> (F1));
+    }
+}
+
 // template <size_t I, size_t F, bool S, bool R>
 // constexpr inline fixed<I, F, S, R> operator*(const fixed<I, F, S, R>& x, const fixed<I, F, S, R>& y) noexcept
 // {

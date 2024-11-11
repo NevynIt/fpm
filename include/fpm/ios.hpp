@@ -470,6 +470,9 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, fixed<IntBi
 template <typename CharT, class Traits, unsigned int IntBits, unsigned int F, bool S, bool R>
 std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, fixed<IntBits, F, S, R>& x)
 {
+    using B = typename fixed<IntBits, F, S, R>::BaseType;
+    using I = typename fixed<IntBits, F, S, R>::IntermediateType;
+
     typename std::basic_istream<CharT, Traits>::sentry sentry(is);
     if (!sentry)
     {
