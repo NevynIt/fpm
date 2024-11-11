@@ -258,6 +258,9 @@ template <size_t IntegralBits, size_t FractionBits, bool Signed = true, bool Ena
 class fixed
 {
 public:
+    static constexpr size_t integral_bits = IntegralBits;
+    static constexpr size_t fractional_bits = FractionBits;
+
     using BaseType = typename std::conditional<Signed, typename detail::type_from_size<IntegralBits + FractionBits>::signed_type, typename detail::type_from_size<IntegralBits + FractionBits>::unsigned_type>::type;
     using IntermediateType = typename std::conditional<Signed, typename detail::type_from_size<IntegralBits + FractionBits>::next_size::signed_type, typename detail::type_from_size<IntegralBits + FractionBits>::next_size::unsigned_type>::type;
 
@@ -375,6 +378,12 @@ public:
         return m_value & (FRACTION_MULT - 1);
     }
 
+    // Return an expanded version of the fixed-point number.
+    constexpr inline fixed<IntegralBits*2, FractionBits*2, Signed, EnableRounding> expand() const noexcept
+    {
+        return fixed<IntegralBits*2, FractionBits*2, Signed, EnableRounding>(m_value << FractionBits, raw_construct_tag{});
+    }
+
     constexpr inline fixed mod1() const noexcept
     {
         return fixed::from_raw_value(m_value & (FRACTION_MULT - 1));
@@ -485,9 +494,7 @@ public:
     template <size_t NumFractionBits, typename T, typename ::std::enable_if<(NumFractionBits <= FractionBits)>::type* = nullptr>
     static constexpr inline fixed from_fixed_point(T value) noexcept
     {
-        return fixed(static_cast<BaseType>(
-            value * (T(1) << (FractionBits - NumFractionBits))),
-            raw_construct_tag{});
+        return fixed(static_cast<BaseType>(value), raw_construct_tag{}) * (fixed(1) << (FractionBits - NumFractionBits));
     }
 
     // Constructs a fixed-point number from its raw underlying value.
@@ -915,6 +922,21 @@ template <size_t I, size_t F, bool S, bool R>
 constexpr bool numeric_limits<fpm::fixed<I, F, S, R>>::traps;
 template <size_t I, size_t F, bool S, bool R>
 constexpr bool numeric_limits<fpm::fixed<I, F, S, R>>::tinyness_before;
+
+/// @cond undocumented
+template<typename>
+struct __is_fixed_point_helper
+: public ::std::false_type { };
+
+template <size_t I, size_t F, bool S, bool R>
+struct __is_fixed_point_helper<fpm::fixed<I,F,S,R>>
+: public ::std::true_type { };
+
+/// is_fixed_point
+template<typename _Tp>
+struct is_fixed_point
+: public __is_fixed_point_helper<__remove_cv_t<_Tp>>::type
+{ };
 
 }
 
