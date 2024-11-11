@@ -665,8 +665,8 @@ constexpr inline fixed<I, F, S, R> operator*(T x, const fixed<I, F, S, R>& y) no
     return fixed<I, F, S, R>(y) *= x;
 }
 
-template<size_t I1, size_t F1, bool S1, size_t I2, size_t F2, bool S2>
-typename std::enable_if<(I1 > I2), fpm::fixed<I1, F1, S1>>::type
+template<size_t I1, size_t F1, bool S1, bool R1, size_t I2, size_t F2, bool S2, bool R2>
+typename std::enable_if<(I1 > I2), fpm::fixed<I1, F1, S1, R1>>::type
 operator*(const fpm::fixed<I1, F1, S1>& a, const fpm::fixed<I2, F2, S2>& b)
 {
     static_assert(S1 == S2, "Signedness must be the same");
@@ -682,9 +682,9 @@ operator*(const fpm::fixed<I1, F1, S1>& a, const fpm::fixed<I2, F2, S2>& b)
     }
 }
 
-template<size_t I1, size_t F1, bool S1, size_t I2, size_t F2, bool S2>
-typename std::enable_if<(I1 < I2), fpm::fixed<I2, F2, S2>>::type
-operator*(const fpm::fixed<I1, F1, S1>& a, const fpm::fixed<I2, F2, S2>& b)
+template<size_t I1, size_t F1, bool S1, bool R1, size_t I2, size_t F2, bool S2, bool R2>
+typename std::enable_if<(I1 < I2), fpm::fixed<I2, F2, S2, R2>>::type
+operator*(const fpm::fixed<I1, F1, S1, R1>& a, const fpm::fixed<I2, F2, S2, R2>& b)
 {
     static_assert(S1 == S2, "Signedness must be the same");
     if (S1)
