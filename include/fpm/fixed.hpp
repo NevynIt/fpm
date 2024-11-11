@@ -297,17 +297,19 @@ public:
 #pragma GCC diagnostic pop
 #endif
 
+    //WARNING: I REMOVED the Explicit constructors for fixed
+
     // Converts an integral number to the fixed-point type.
     // Like static_cast, this truncates bits that don't fit.
     template <typename T, typename ::std::enable_if<::std::is_integral<T>::value>::type* = nullptr>
-    constexpr inline explicit fixed(T val) noexcept
+    constexpr inline fixed(T val) noexcept
         : m_value(static_cast<BaseType>(val * FRACTION_MULT))
     {}
 
     // Converts an floating-point number to the fixed-point type.
     // Like static_cast, this truncates bits that don't fit.
     template <typename T, typename ::std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    constexpr inline explicit fixed(T val) noexcept
+    constexpr inline fixed(T val) noexcept
         : m_value(static_cast<BaseType>((EnableRounding) ?
 		       (val >= 0.0) ? (val * FRACTION_MULT + T{0.5}) : (val * FRACTION_MULT - T{0.5})
 		      : (val * FRACTION_MULT)))
